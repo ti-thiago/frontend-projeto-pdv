@@ -1,0 +1,18 @@
+.Login {
+  padding: 60px 0;
+}
+
+.Login form {
+  margin: 0 auto;
+  max-width: 20rem;
+}
+
+.card-blank {
+  border-radius: 10px;
+  background-color: #fff;
+  -webkit-box-shadow: 0 10px 20px 1px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 10px 20px 1px rgb(0 0 0 / 5%);
+  height: 100%;
+  width: 100%;
+  justify-content: center;
+}
