@@ -3,34 +3,47 @@ import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import "./index.css";
 import { Col, Container, Row } from "react-bootstrap";
+import Header from "../components/Header";
 import api from "../services/api";
+import { useAuth } from "../hooks/auth";
+import { useHistory } from "react-router-dom";
 const Index: React.FC = () => {
-  const [email, setEmail] = React.useState("");
+  const [userName, setUserName] = React.useState("");
   const [password, setPassword] = React.useState("");
-
+  const history = useHistory();
+  const { user, signIn } = useAuth();
   function validateForm() {
-    return email.length > 0 && password.length > 0;
+    return userName.length > 0 && password.length > 0;
   }
-  React.useEffect(() => {
-    async function getData() {
-      try {
-        const x = await api.get("/");
-        console.log(x);
-      } catch (err) {
-        alert(`Ocorreu um erro ao obter os dados ${err.message}`);
-      }
-    }
-    getData();
-  }, []);
+
   async function handleSubmit(event: any) {
     event.preventDefault();
 
     try {
-      await api.post("/", { email, senha: password });
+      await signIn({ nome_usuario: userName, senha: password });
+      // const result = await api.post("/", {
+      //   nome_usuario: userName,
+      //   senha: password,
+      // });
+      // localStorage.setItem("@PdvUser", JSON.stringify(result.data));
+      // history.push("/pessoa-fisica");
     } catch (err) {
+      console.log(err);
       alert(`Ocorreu um erro ao fazer login ${err.message}`);
     }
   }
+
+  // async function getData() {
+  //   try {
+  //     const result = await api.get("/");
+  //   } catch (err) {
+  //     console.log(err);
+  //     alert(`Ocorreu um erro ao fazer login ${err.message}`);
+  //   }
+  // }
+  // React.useEffect(() => {
+  //   getData();
+  // }, []);
 
   return (
     <>
@@ -47,21 +60,20 @@ const Index: React.FC = () => {
         <Container>
           <Form onSubmit={handleSubmit}>
             <Row className="justify-content-center ">
-              <Col md={{ span: 3, offset: 3 }}>
+              <Col xl={4}>
                 <Form.Group controlId="email">
-                  <Form.Label>Email</Form.Label>
+                  <Form.Label>Nome de Usuário</Form.Label>
                   <Form.Control
                     placeholder="Digite o usuário"
                     autoFocus
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    value={userName}
+                    onChange={(e) => setUserName(e.target.value)}
                   />
                 </Form.Group>
               </Col>
             </Row>
-            <Row className="justify-content-center ">
-              <Col xl={12}>
+            <Row className="justify-content-center mt-2">
+              <Col xl={4}>
                 <Form.Group controlId="password">
                   <Form.Label>Senha</Form.Label>
                   <Form.Control
@@ -73,8 +85,8 @@ const Index: React.FC = () => {
                 </Form.Group>
               </Col>
             </Row>
-            <Row className="justify-content-center ">
-              <Col xl={12}>
+            <Row className="justify-content-center mt-2">
+              <Col xl={4}>
                 <Button type="submit" disabled={!validateForm()}>
                   Login
                 </Button>
