@@ -84,11 +84,13 @@ const Produtos: React.FC = () => {
   }
   async function handleDelete() {
     try {
+      if (!idxProduto) return;
       await api.delete(`/produtos/${produtos[idxProduto].idproduto}`);
       addToast({
         title: "Sucesso",
         message: `Produto deletado com sucesso`,
       });
+      window.location.reload();
     } catch (err) {
       addToast({
         title: "Erro",
@@ -204,7 +206,6 @@ const Produtos: React.FC = () => {
                 <Button
                   onClick={async () => {
                     await handleDelete();
-                    window.location.reload();
                   }}
                   variant="danger"
                 >
