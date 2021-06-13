@@ -16,31 +16,23 @@ const PessoaFisica: React.FC = () => {
   const { user, updateUser } = useAuth();
   const { addToast } = useToast();
   const selectRef = React.useRef<HTMLSelectElement>(null);
+  const [pessoaJuridica, setPessoaJuridica] = React.useState<any>([]);
   const [idxPessoa, setIdxPessoa] = React.useState<any>();
   const [loading, setLoading] = React.useState(false);
-  const [newPerson, setNewPerson] = React.useState(false);
-  const [nome, setNome] = React.useState("");
-  const [nrCpf, setNrCpf] = React.useState("");
-  const [dtNascimento, setDtNascimento] = React.useState("");
-  const [nrIdentidade, setNrIdentidade] = React.useState("");
-  const [orgaoEmissorRg, setOrgaoEmissorRg] = React.useState("");
-  const [ufOrgaoEmissorRg, setUfOrgaoEmissorRg] = React.useState("");
-
-  const [estadoCivil, setEstadoCivil] = React.useState("");
-  const [sexo, setSexo] = React.useState("");
+  const [razaoSocial, setRazaoSocial] = React.useState("");
+  const [nomeFantasia, setNomeFantasia] = React.useState("");
+  const [cnpj, setCnpj] = React.useState("");
+  const [inscEstadual, setInscEstadual] = React.useState("");
   const [cep, setCep] = React.useState("");
   const [logradouro, setLogradouro] = React.useState("");
   const [numero, setNumero] = React.useState("");
   const [bairro, setBairro] = React.useState("");
   const [municipio, setMunicipio] = React.useState("");
   const [uf, setUf] = React.useState(user.uf);
-  const [telResidencial, setTelResidencial] = React.useState("");
-  const [telCelular, setTelCelular] = React.useState("");
-
+  const [telefone, setTelefone] = React.useState("");
   const [eMail, setEmail] = React.useState("");
-  const [whatsapp, setWhatsapp] = React.useState("");
-
-  const [pessoaFisica, setPessoaFisica] = React.useState<any>([]);
+  const [pessoaContato, setPessoaContato] = React.useState("");
+  const [observacao, setObservacao] = React.useState("");
 
   async function getPessoaData(id?: any) {
     let data = "";
@@ -49,35 +41,30 @@ const PessoaFisica: React.FC = () => {
       if (id) {
         data = id;
 
-        const resp = await api.get(`/pessoaFisica/${data}`);
-        let dt = "";
-        setNome(resp.data.nome);
-        setNrCpf(resp.data.nr_cpf);
-        if (resp.data.dt_nascimento) {
-          dt = resp.data.dt_nascimento;
-          dt = moment(dt, "YYYY-MM-DD").format("DD/MM/YYYY");
-        }
-        setDtNascimento(dt);
-        setNrIdentidade(resp.data.nr_identidade);
-        setOrgaoEmissorRg(resp.data.orgao_emissor_rg);
-        setEstadoCivil(resp.data.estado_civil);
-        setSexo(resp.data.sexo);
+        const resp = await api.get(`/pessoaJuridica/${data}`);
+        setRazaoSocial(resp.data.razao_social);
+        setInscEstadual(resp.data.insc_estadual);
+        setNomeFantasia(resp.data.nome_fantasia);
+        setCnpj(resp.data.cnpj);
         setCep(resp.data.cep);
         setLogradouro(resp.data.logradouro);
         setNumero(resp.data.numero);
         setBairro(resp.data.bairro);
         setMunicipio(resp.data.municipio);
         setUf(resp.data.uf);
-        setTelResidencial(resp.data.tel_residencial);
-        setTelCelular(resp.data.tel_celular);
+        setTelefone(resp.data.telefone);
+        setPessoaContato(resp.data.pessoa_contato);
         setEmail(resp.data.e_mail);
-        setWhatsapp(resp.data.whatsapp);
+        setObservacao(resp.data.observacao);
       } else {
-        const resp = await api.get(`/pessoaFisica/`);
+        const resp = await api.get(`/pessoaJuridica/`);
         let arrayFiltered = resp.data;
-        arrayFiltered.unshift({ idpessoa_fisica: "", nome: "Selecione" });
+        arrayFiltered.unshift({
+          idpessoa_juridica: "",
+          razao_social: "Selecione",
+        });
 
-        setPessoaFisica(arrayFiltered);
+        setPessoaJuridica(arrayFiltered);
       }
     } catch (err) {
       addToast({
@@ -90,63 +77,80 @@ const PessoaFisica: React.FC = () => {
     getPessoaData();
   }, []);
 
-  async function handleSubmit(ev: any) {
-    ev.preventDefault();
-    let dtNasc;
-    if (dtNascimento)
-      dtNasc = moment(dtNascimento, "DD/MM/YYYY").format("YYYY-MM-DD");
+  const handleSubmit = React.useCallback(
+    async (ev: any) => {
+      ev.preventDefault();
 
-    let obj: any = {};
+      let obj: any = {};
 
-    obj.nome = nome;
-    obj.nr_cpf = onlyNumbers(nrCpf) || null;
-    obj.dt_nascimento = dtNasc;
-    obj.nr_identidade = onlyNumbers(nrIdentidade) || null;
-    obj.orgao_emissor_rg = orgaoEmissorRg;
-    obj.uf_orgao_emissor_rg = ufOrgaoEmissorRg;
-    obj.estado_civil = estadoCivil;
-    obj.sexo = sexo;
-    obj.cep = onlyNumbers(cep) || null;
-    obj.logradouro = logradouro;
-    obj.numero = onlyNumbers(numero) || null;
-    obj.bairro = bairro;
-    obj.municipio = municipio;
-    obj.uf = uf;
-    obj.tel_residencial = onlyNumbers(telResidencial) || null;
-    obj.tel_celular = onlyNumbers(telCelular) || null;
-    obj.e_mail = eMail;
-    obj.whatsapp = whatsapp || "N";
-    try {
-      setLoading(true);
-      let resp;
-      if (!idxPessoa) {
-        resp = await api.post(`/pessoaFisica/`, obj);
-      } else {
-        resp = await api.put(
-          `/pessoaFisica/${pessoaFisica[idxPessoa].idpessoa_fisica}`,
-          obj
-        );
+      obj.razao_social = razaoSocial;
+      obj.insc_estadual = inscEstadual;
+      obj.nome_fantasia = nomeFantasia;
+      obj.cnpj = onlyNumbers(cnpj) || null;
+      obj.cep = onlyNumbers(cep) || null;
+      obj.logradouro = logradouro;
+      obj.numero = onlyNumbers(numero) || null;
+      obj.bairro = bairro;
+      obj.municipio = municipio;
+      obj.uf = uf;
+      obj.telefone = onlyNumbers(telefone) || null;
+      obj.e_mail = eMail;
+      obj.pessoa_contato = pessoaContato;
+      obj.observacao = observacao;
+
+      try {
+        setLoading(true);
+        let resp;
+        if (!idxPessoa) {
+          resp = await api.post(`/pessoaJuridica/`, obj);
+        } else {
+          resp = await api.put(
+            `/pessoaJuridica/${pessoaJuridica[idxPessoa].idpessoa_juridica}`,
+            obj
+          );
+        }
+
+        setLoading(false);
+
+        addToast({
+          title: "Sucesso",
+          message: "Dados atualizados, com sucesso",
+        });
+        window.location.reload();
+      } catch (err) {
+        setLoading(false);
+        addToast({
+          title: "Erro",
+          message: `Ocorreu um erro ao atualizar os dados ${err.message}`,
+        });
       }
-
-      setLoading(false);
-
-      updateUser(resp.data);
-      addToast({ title: "Sucesso", message: "Dados atualizados, com sucesso" });
-      window.location.reload();
-    } catch (err) {
-      setLoading(false);
-      addToast({
-        title: "Erro",
-        message: `Ocorreu um erro ao atualizar os dados ${err.message}`,
-      });
-    }
-  }
+    },
+    [
+      addToast,
+      bairro,
+      cep,
+      cnpj,
+      eMail,
+      idxPessoa,
+      inscEstadual,
+      logradouro,
+      municipio,
+      nomeFantasia,
+      numero,
+      observacao,
+      pessoaContato,
+      pessoaJuridica,
+      razaoSocial,
+      telefone,
+      uf,
+    ]
+  );
 
   async function handleDelete() {
     try {
       if (!idxPessoa) return;
       await api.delete(
-        `/pessoaFisica/${pessoaFisica[idxPessoa].idpessoa_fisica}`
+        `/pessoaJuridica/${pessoaJuridica[idxPessoa].idpessoa_juridica}`
       );
     } catch (err) {
       setLoading(false);
@@ -161,7 +165,7 @@ const PessoaFisica: React.FC = () => {
       <Header />
       <Container>
         <Form onSubmit={handleSubmit}>
-          <h3>Dados Pessoais</h3>
+          <h3>Dados da Empresa</h3>
           <Form.Row>
             <Col xl={6}>
               <Form.Group
@@ -169,26 +173,26 @@ const PessoaFisica: React.FC = () => {
                 controlId="formGridState"
                 style={{ marginBottom: "30px" }}
               >
-                <Form.Label>Selecione a Pessoa</Form.Label>
+                <Form.Label>Selecione a Empresa</Form.Label>
                 <Form.Control
                   ref={selectRef}
                   as="select"
                   defaultValue={0}
                   onChange={async (ev: any) => {
                     await getPessoaData(
-                      pessoaFisica[ev.target.value].idpessoa_fisica
+                      pessoaJuridica[ev.target.value].idpessoa_juridica
                     );
                     setIdxPessoa(ev.target.value);
                   }}
                 >
-                  {pessoaFisica ? (
-                    pessoaFisica.map((pessoa: any, idx: any) => (
-                      <option key={pessoa.idpessoa_fisica} value={idx}>
-                        {pessoa.nome}
+                  {pessoaJuridica ? (
+                    pessoaJuridica.map((pessoa: any, idx: any) => (
+                      <option key={pessoa.idpessoa_juridica} value={idx}>
+                        {pessoa.razao_social}
                       </option>
                     ))
                   ) : (
-                    <option>Sem pessoas</option>
+                    <option>Sem Empresas</option>
                   )}
                 </Form.Control>
               </Form.Group>
@@ -199,79 +203,46 @@ const PessoaFisica: React.FC = () => {
               <Form.Label>Código</Form.Label>
               <Form.Control placeholder="Código" disabled />
             </Col>
-            <Col xl={8} style={{ marginLeft: "50px" }}>
-              <Form.Label>Nome</Form.Label>
+            <Col xl={2} style={{ marginLeft: "10px" }}>
+              <Form.Label>CNPJ</Form.Label>
+
               <Form.Control
                 required
-                value={nome}
-                onChange={(ev) => setNome(ev.target.value)}
-                placeholder="Digite o nome"
+                placeholder="00000000000000"
+                onChange={(ev) => setCnpj(ev.target.value)}
+                value={cnpj}
+              />
+            </Col>
+            <Col xl={8} style={{ marginLeft: "10px" }}>
+              <Form.Label>Inscrição Estadual</Form.Label>
+              <Form.Control
+                required
+                value={inscEstadual}
+                onChange={(ev) => setInscEstadual(ev.target.value)}
               />
             </Col>
           </Form.Row>
 
           <Form.Row style={{ display: "flex", flexDirection: "row" }}>
-            <Col xl={2}>
-              <Form.Label>Dt. Nascimento</Form.Label>
+            <Col xl={8}>
+              <Form.Label>Razão Social</Form.Label>
               <Form.Control
                 required
-                placeholder="DD/MM/AAAA"
-                onChange={(ev) => setDtNascimento(ev.target.value)}
-                value={dtNascimento}
-              />
-            </Col>
-            <Col xl={2} style={{ marginLeft: "10px" }}>
-              <Form.Label>Sexo</Form.Label>
-              <Form.Control
-                required
-                maxLength={1}
-                value={sexo}
-                onChange={(ev) => setSexo(ev.target.value)}
-              />
-            </Col>
-            <Col xl={4} style={{ marginLeft: "10px" }}>
-              <Form.Label>CPF</Form.Label>
-              <Form.Control
-                value={nrCpf}
-                placeholder="0000000000"
-                maxLength={11}
-                onChange={(ev) => setNrCpf(ev.target.value)}
-              />
-            </Col>
-            <Col xl={2} style={{ marginLeft: "10px" }}>
-              <Form.Label>Estado Civíl</Form.Label>
-              <Form.Control
-                maxLength={1}
-                onChange={(ev) => setEstadoCivil(ev.target.value)}
-                value={estadoCivil}
+                value={razaoSocial}
+                onChange={(ev) => setRazaoSocial(ev.target.value)}
               />
             </Col>
           </Form.Row>
-
           <Form.Row style={{ display: "flex", flexDirection: "row" }}>
-            <Col xl={1}>
-              <Form.Label>Nr. Identidade</Form.Label>
+            <Col xl={8}>
+              <Form.Label>Nome Fantasia</Form.Label>
               <Form.Control
-                onChange={(ev) => setNrIdentidade(ev.target.value)}
-                value={nrIdentidade}
-              />
-            </Col>
-
-            <Col xl={2} style={{ marginLeft: "10px" }}>
-              <Form.Label>Orgão Emissor</Form.Label>
-              <Form.Control
-                onChange={(ev) => setOrgaoEmissorRg(ev.target.value)}
-                value={orgaoEmissorRg}
-              />
-            </Col>
-            <Col xl={1} style={{ marginLeft: "10px" }}>
-              <Form.Label>UF. Emissão</Form.Label>
-              <Form.Control
-                onChange={(ev) => setUfOrgaoEmissorRg(ev.target.value)}
-                value={ufOrgaoEmissorRg}
+                value={nomeFantasia}
+                onChange={(ev) => setNomeFantasia(ev.target.value)}
               />
             </Col>
           </Form.Row>
+
           <h3 style={{ marginTop: "10px" }}>Endereço</h3>
           <Form.Row style={{ display: "flex", flexDirection: "row" }}>
             <Col xl={2} className="mr-2">
@@ -335,38 +306,18 @@ const PessoaFisica: React.FC = () => {
           <h3 style={{ marginTop: "10px" }}>Contatos</h3>
           <Form.Row style={{ display: "flex", flexDirection: "row" }}>
             <Col xl={3} className="mr-2">
-              <Form.Label>Telefone Residencial</Form.Label>
+              <Form.Label>Telefone</Form.Label>
               <Form.Control
-                value={telResidencial}
-                onChange={(ev) => setTelResidencial(ev.target.value)}
+                value={telefone}
+                onChange={(ev) => setTelefone(ev.target.value)}
                 maxLength={11}
               />
             </Col>
             <Col xl={3} style={{ marginLeft: "10px" }}>
-              <Form.Label>Telefone Celular</Form.Label>
+              <Form.Label>Pessoa Contato</Form.Label>
               <Form.Control
-                onChange={(ev) => setTelCelular(ev.target.value)}
-                value={telCelular}
-                maxLength={12}
-              />
-            </Col>
-            <Col
-              xl={3}
-              style={{
-                marginLeft: "10px",
-                alignContent: "stretch",
-              }}
-            >
-              <Form.Check
-                style={{ marginTop: "35px" }}
-                type="checkbox"
-                label="É WhatsApp?"
-                onChange={(ev) => {
-                  if (ev.target.checked) {
-                    setWhatsapp("S");
-                  }
-                }}
-                checked={whatsapp === "S"}
+                onChange={(ev) => setPessoaContato(ev.target.value)}
+                value={pessoaContato}
               />
             </Col>
           </Form.Row>

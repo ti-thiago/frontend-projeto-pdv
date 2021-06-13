@@ -3,15 +3,13 @@ import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import "./index.css";
 import { Col, Container, Row } from "react-bootstrap";
-import Header from "../components/Header";
-import api from "../services/api";
 import { useAuth } from "../hooks/auth";
-import { useHistory } from "react-router-dom";
+import { useToast } from "../hooks/toast";
 const Index: React.FC = () => {
+  const { addToast } = useToast();
   const [userName, setUserName] = React.useState("");
   const [password, setPassword] = React.useState("");
-  const history = useHistory();
-  const { user, signIn } = useAuth();
+  const { signIn } = useAuth();
   function validateForm() {
     return userName.length > 0 && password.length > 0;
   }
@@ -29,7 +27,10 @@ const Index: React.FC = () => {
       // history.push("/pessoa-fisica");
     } catch (err) {
       console.log(err);
-      alert(`Ocorreu um erro ao fazer login ${err.message}`);
+      addToast({
+        title: "Erro",
+        message: `Ocorreu um erro ao fazer login ${err.message}`,
+      });
     }
   }
 

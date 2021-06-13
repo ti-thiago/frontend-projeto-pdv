@@ -53,7 +53,6 @@ interface IAuthContextData {
 const AuthContext = createContext<IAuthContextData>({} as IAuthContextData);
 
 const AuthProvider: React.FC = ({ children }) => {
-  const history = useHistory();
   const [data, setData] = useState<IAuthState>(() => {
     const user = localStorage.getItem("@PdvUser");
 

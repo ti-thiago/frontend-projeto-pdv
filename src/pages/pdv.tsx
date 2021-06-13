@@ -12,6 +12,7 @@ import {
 import Header from "../components/Header";
 import api from "../services/api";
 import { useAuth } from "../hooks/auth";
+import { useToast } from "../hooks/toast";
 
 function handleRenderTable(arrayProds: any) {
   return (
@@ -52,6 +53,7 @@ function handleRenderTable(arrayProds: any) {
 
 const Pdv: React.FC = () => {
   const { user } = useAuth();
+  const { addToast } = useToast();
   const [arrayProducts, setArrayProducts] = React.useState<any>([]);
   const [idxProduct, setIdxProduct] = React.useState<any>(0);
   const [produtos, setProdutos] = React.useState<any>([]);
@@ -65,6 +67,7 @@ const Pdv: React.FC = () => {
   const [valTroco, setValTroco] = React.useState<any>(0);
 
   const vlTotalRef = React.useRef<any>();
+  const vlDescontoRef = React.useRef<any>();
   async function getData() {
     try {
       const resp = await api.get("/produtos");
@@ -79,7 +82,10 @@ const Pdv: React.FC = () => {
 
       setProdutos(arrayFiltered);
     } catch (err) {
-      alert(`Não foi possível obter os produtos ${err.message}`);
+      addToast({
+        title: "Erro",
+        message: `Ocorreu um erro ao obter os dados ${err.message}`,
+      });
     }
   }
 
@@ -111,6 +117,7 @@ const Pdv: React.FC = () => {
         <Col xl={1} style={{ marginRight: "10px" }}>
           <Form.Label>Valor desconto</Form.Label>
           <Form.Control
+            ref={vlDescontoRef}
             value={descValPdt}
             onChange={(ev) => setDescValPdt(ev.target.value)}
           />
@@ -126,6 +133,8 @@ const Pdv: React.FC = () => {
         <Col xl={2} style={{ paddingTop: "32px", marginRight: "-70px" }}>
           <Button
             onClick={(ev) => {
+              if (produtos[idxProduct].desc_produto === "Selecione") return;
+
               let newArray = {
                 ...produtos[idxProduct],
                 vlLiq: vlTotalRef.current.value,
@@ -133,15 +142,20 @@ const Pdv: React.FC = () => {
                 qtd: qtd,
               };
 
-              setDescValPdt(0);
-
-              setQtd(1);
-
-              if (produtos[idxProduct].desc_produto === "Selecione") return;
+              setvalTotalNota(
+                (prev: any) =>
+                  parseFloat(vlTotalRef.current.value) + parseFloat(prev)
+              );
+              setDescValNota(
+                (prev: any) => parseFloat(prev) + parseFloat(descValPdt)
+              );
 
               setArrayProducts((prev: any) => {
                 return [...prev, newArray];
               });
+
+              setQtd(1);
+              setDescValPdt(0);
             }}
             variant="success"
           >
@@ -150,14 +164,26 @@ const Pdv: React.FC = () => {
         </Col>
         <Col xl={1} style={{ paddingTop: "33px" }}>
           <Button
-            onClick={(ev) => {
-              let x = arrayProducts;
-              x.pop();
-              setArrayProducts([...x]);
-              setvalTotalNota(
-                (prev: any) =>
-                  parseFloat(prev) - parseFloat(vlTotalRef.current.value)
-              );
+            onClick={async (ev) => {
+              await setvalTotalNota((prev: any) => {
+                if (arrayProducts.length)
+                  return (
+                    parseFloat(prev) -
+                    parseFloat(arrayProducts[arrayProducts.length - 1].vlLiq)
+                  );
+                return parseFloat(prev) - parseFloat(prev);
+              });
+              await setDescValNota((prev: any) => {
+                if (arrayProducts.length) {
+                  return (
+                    parseFloat(prev) -
+                    parseFloat(arrayProducts[arrayProducts.length - 1].vlDesc)
+                  );
+                }
+                return parseFloat(prev) - parseFloat(prev);
+              });
+              arrayProducts.pop();
+              setArrayProducts([...arrayProducts]);
             }}
             variant="danger"
           >
@@ -169,15 +195,7 @@ const Pdv: React.FC = () => {
   }
 
   React.useEffect(() => {
-    if (arrayProducts.length)
-      arrayProducts.forEach((val: any) => {
-        setvalTotalNota(
-          (prev: any) => parseFloat(val.vlLiq) + parseFloat(prev)
-        );
-        setDescValNota(
-          (prev: any) => parseFloat(prev) + parseFloat(val.vlDesc)
-        );
-      });
+    if (arrayProducts.length) arrayProducts.forEach((val: any) => {});
   }, [arrayProducts]);
 
   const handleSubmit = React.useCallback(async () => {
@@ -188,10 +206,19 @@ const Pdv: React.FC = () => {
       valor_desconto: descValNota,
       valor_liquido: valTotalNota,
     };
+
+    let objMov = {
+      identrada_produto: null,
+      idvenda: null,
+    };
     try {
-      await api.post("/entradaNota", obj);
+      await api.post("/venda", obj);
+      addToast({ title: "Sucesso", message: "Dados enviados com sucesso" });
     } catch (err) {
-      alert(`Ocorreu um erro ao confirmar ${err.message}`);
+      addToast({
+        title: "Erro",
+        message: `Ocorreu um erro ao confirmar ${err.message}`,
+      });
     }
   }, [descValNota, user.idpessoa_fisica, user.idpessoa_juridica, valTotalNota]);
 
@@ -204,11 +231,11 @@ const Pdv: React.FC = () => {
             <h3>PDV</h3>
             <Form>
               <Form.Row style={{ display: "flex", flexDirection: "row" }}>
-                <Col xl={1} style={{ marginRight: "50px" }}>
+                <Col xl={1} style={{ marginRight: "10px" }}>
                   <Form.Label>Código</Form.Label>
                   <Form.Control disabled />
                 </Col>
-                <Col xl={8}>
+                <Col xl={5}>
                   <Form.Label>Produto</Form.Label>
                   <Form.Control
                     onChange={(ev) => {}}
@@ -250,7 +277,7 @@ const Pdv: React.FC = () => {
                   <Form.Label>Desconto</Form.Label>
                   <Form.Control
                     onChange={(ev) => {}}
-                    value={descValNota || 0}
+                    value={descValNota.toFixed(2) || 0}
                     disabled
                   />
                 </Col>
@@ -258,7 +285,7 @@ const Pdv: React.FC = () => {
                   <Form.Label>Valor Líquido</Form.Label>
                   <Form.Control
                     onChange={(ev) => {}}
-                    value={valTotalNota || 0}
+                    value={valTotalNota.toFixed(2) || 0}
                     disabled
                   />
                 </Col>

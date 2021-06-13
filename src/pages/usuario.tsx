@@ -2,8 +2,10 @@ import React from "react";
 import { Container, Form, Col, Row, Button } from "react-bootstrap";
 import Header from "../components/Header";
 import api from "../services/api";
+import { useToast } from "../hooks/toast";
 
 const Usuario: React.FC = () => {
+  const { addToast } = useToast();
   const [nomeUsuario, setNomeUsuario] = React.useState("");
   const [pessoaFisica, setPessoaFisica] = React.useState<any>([]);
   const [idxPessoa, setIdxPessoa] = React.useState(0);
@@ -15,7 +17,10 @@ const Usuario: React.FC = () => {
       setPessoaFisica(resp.data);
       console.log(resp.data);
     } catch (err) {
-      alert("Ocorreu um erro ao obter os dados de Pessoa Fisica");
+      addToast({
+        title: "Erro",
+        message: `Ocorreu um erro ao obter os dados de Pessoa Fisica ${err.message}`,
+      });
     }
   }
   React.useEffect(() => {
@@ -33,7 +38,10 @@ const Usuario: React.FC = () => {
 
       alert(`${resp.data}`);
     } catch (err) {
-      alert(`Ocorreu um erro ao cadastrar usuário ${err.message}`);
+      addToast({
+        title: "Erro",
+        message: `Ocorreu um erro ao cadastrar usuário ${err.message}`,
+      });
     }
   }, [idxPessoa, nomeUsuario, pessoaFisica, senhaUsuario]);
 

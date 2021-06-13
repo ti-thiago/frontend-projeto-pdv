@@ -1,12 +1,5 @@
 import React from "react";
-import {
-  Button,
-  Form,
-  FormControl,
-  Nav,
-  Navbar,
-  NavDropdown,
-} from "react-bootstrap";
+import { Nav, Navbar } from "react-bootstrap";
 import { useAuth } from "../hooks/auth";
 const Header: React.FC = () => {
   const { signOut, user } = useAuth();
@@ -17,13 +10,11 @@ const Header: React.FC = () => {
       </Navbar.Brand>
       <Navbar.Collapse id="basic-navbar-nav">
         <Nav className="mr-auto">
-          <Nav.Link href="/">Home</Nav.Link>
-          <Nav.Link href={`/pessoa-fisica/${user.idpessoa_fisica}`}>
-            Pessoa Física
-          </Nav.Link>
           <Nav.Link href="/usuario">Usuário</Nav.Link>
-          <Nav.Link href="/vendas">Vendas</Nav.Link>
+          <Nav.Link href="/pessoa-fisica">Pessoa Física</Nav.Link>
+          <Nav.Link href="/pessoa-juridica">Empresas</Nav.Link>
           <Nav.Link href="/produtos">Produtos</Nav.Link>
+          <Nav.Link href="/entrada-produto">Entrada Produtos</Nav.Link>
           <Nav.Link href="/pdv">PDV</Nav.Link>
         </Nav>
       </Navbar.Collapse>
