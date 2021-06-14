@@ -48,9 +48,17 @@ const Produtos: React.FC = () => {
         setEstoque("");
         setCodBarras("");
       } catch (err) {
+        let msg;
+        if (err.response && err.response.data && err.response.data.err)
+          msg = err.response.data.err;
+        else if (err.response.data) msg = err.response.data;
+        else msg = err.message.err;
+        if (typeof msg === "object") {
+          msg = msg.msg;
+        }
         addToast({
           title: "Erro",
-          message: `Ocorreu um erro ao enviar os produtos ${err.response.data}`,
+          message: `Ocorreu um erro ao enviar os produtos ${msg}`,
         });
       }
     },
@@ -76,9 +84,17 @@ const Produtos: React.FC = () => {
         setProdutos(arrayFiltered);
       }
     } catch (err) {
+      let msg;
+      if (err.response && err.response.data && err.response.data.err)
+        msg = err.response.data.err;
+      else if (err.response.data) msg = err.response.data;
+      else msg = err.message.err;
+      if (typeof msg === "object") {
+        msg = msg.msg;
+      }
       addToast({
         title: "Erro",
-        message: `Ocorreu um erro ao obter os produtos ${err.response.data}`,
+        message: `Ocorreu um erro ao obter os produtos ${msg}`,
       });
     }
   }
@@ -92,9 +108,17 @@ const Produtos: React.FC = () => {
       });
       window.location.reload();
     } catch (err) {
+      let msg;
+      if (err.response && err.response.data && err.response.data.err)
+        msg = err.response.data.err;
+      else if (err.response.data) msg = err.response.data;
+      else msg = err.message.err;
+      if (typeof msg === "object") {
+        msg = msg.msg;
+      }
       addToast({
         title: "Erro",
-        message: `Ocorreu um erro ao deletar o produto ${err.response.data}`,
+        message: `Ocorreu um erro ao deletar o produto ${msg}`,
       });
     }
   }

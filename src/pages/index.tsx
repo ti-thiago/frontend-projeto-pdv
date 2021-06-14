@@ -26,10 +26,18 @@ const Index: React.FC = () => {
       // localStorage.setItem("@PdvUser", JSON.stringify(result.data));
       // history.push("/pessoa-fisica");
     } catch (err) {
+      let msg;
+      if (err.response && err.response.data && err.response.data.err)
+        msg = err.response.data.err;
+      else if (err.response.data) msg = err.response.data;
+      else msg = err.message.err;
+      if (typeof msg === "object") {
+        msg = msg.msg;
+      }
       console.log(err, err.response.data);
       addToast({
         title: "Erro",
-        message: `${err.response.data}`,
+        message: `${msg}`,
       });
     }
   }

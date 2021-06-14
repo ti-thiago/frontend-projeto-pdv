@@ -80,9 +80,17 @@ const PessoaFisica: React.FC = () => {
         setPessoaFisica(arrayFiltered);
       }
     } catch (err) {
+      let msg;
+      if (err.response && err.response.data && err.response.data.err)
+        msg = err.response.data.err;
+      else if (err.response.data) msg = err.response.data;
+      else msg = err.message.err;
+      if (typeof msg === "object") {
+        msg = msg.msg;
+      }
       addToast({
         title: "Erro",
-        message: `Ocorreu um erro ao obter os dados ${err.response.data}`,
+        message: `Ocorreu um erro ao obter os dados ${msg}`,
       });
     }
   }
@@ -134,10 +142,18 @@ const PessoaFisica: React.FC = () => {
       addToast({ title: "Sucesso", message: "Dados atualizados, com sucesso" });
       window.location.reload();
     } catch (err) {
+      let msg;
+      if (err.response && err.response.data && err.response.data.err)
+        msg = err.response.data.err;
+      else if (err.response.data) msg = err.response.data;
+      else msg = err.message.err;
+      if (typeof msg === "object") {
+        msg = msg.msg;
+      }
       setLoading(false);
       addToast({
         title: "Erro",
-        message: `Ocorreu um erro ao atualizar os dados ${err.response.data}`,
+        message: `Ocorreu um erro ao atualizar os dados ${msg}`,
       });
     }
   }
@@ -149,10 +165,18 @@ const PessoaFisica: React.FC = () => {
         `/pessoaFisica/${pessoaFisica[idxPessoa].idpessoa_fisica}`
       );
     } catch (err) {
+      let msg;
+      if (err.response && err.response.data && err.response.data.err)
+        msg = err.response.data.err;
+      else if (err.response.data) msg = err.response.data;
+      else msg = err.message.err;
+      if (typeof msg === "object") {
+        msg = msg.msg;
+      }
       setLoading(false);
       addToast({
         title: "Erro",
-        message: `Ocorreu um erro ao excluir os dados ${err.response.data}`,
+        message: `Ocorreu um erro ao excluir os dados ${msg}`,
       });
     }
   }

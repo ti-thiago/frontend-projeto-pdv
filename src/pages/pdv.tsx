@@ -39,10 +39,10 @@ function handleRenderTable(arrayProds: any) {
             >
               <td>{pdt.idproduto}</td>
               <td>{pdt.desc_produto}</td>
-              <td>{pdt.qtd}</td>
+              <td>{pdt.qtd_saida}</td>
               <td>{pdt.preco_venda}</td>
-              <td>{pdt.vlDesc}</td>
-              <td>{pdt.vlLiq}</td>
+              <td>{pdt.vl_desconto}</td>
+              <td>{pdt.vl_venda}</td>
             </tr>
           ))}
         </tbody>
@@ -82,9 +82,17 @@ const Pdv: React.FC = () => {
 
       setProdutos(arrayFiltered);
     } catch (err) {
+      let msg;
+      if (err.response && err.response.data && err.response.data.err)
+        msg = err.response.data.err;
+      else if (err.response.data) msg = err.response.data;
+      else msg = err.message.err;
+      if (typeof msg === "object") {
+        msg = msg.msg;
+      }
       addToast({
         title: "Erro",
-        message: `Ocorreu um erro ao obter os dados ${err.response.data}`,
+        message: `Ocorreu um erro ao obter os dados ${msg}`,
       });
     }
   }
@@ -137,9 +145,9 @@ const Pdv: React.FC = () => {
 
               let newArray = {
                 ...produtos[idxProduct],
-                vlLiq: vlTotalRef.current.value,
-                vlDesc: descValPdt,
-                qtd: qtd,
+                vl_venda: vlTotalRef.current.value,
+                vl_desconto: descValPdt,
+                qtd_saida: qtd,
               };
 
               setvalTotalNota(
@@ -194,33 +202,41 @@ const Pdv: React.FC = () => {
     );
   }
 
-  React.useEffect(() => {
-    if (arrayProducts.length) arrayProducts.forEach((val: any) => {});
-  }, [arrayProducts]);
-
   const handleSubmit = React.useCallback(async () => {
     let obj = {
-      idpessoa_fisica: user.idpessoa_fisica,
-      idpessoa_juridica: user.idpessoa_juridica,
-      valor_bruto: valTotalNota,
-      valor_desconto: descValNota,
-      valor_liquido: valTotalNota,
+      idpessoa_fisica: user.idpessoa_fisica || null,
+      idpessoa_juridica: user.idpessoa_juridica || null,
+      vl_bruto: valTotalNota,
+      vl_desconto: descValNota,
+      vl_liquido: valTotalNota - descValNota,
+      itens: arrayProducts,
     };
 
-    let objMov = {
-      identrada_produto: null,
-      idvenda: null,
-    };
     try {
       await api.post("/venda", obj);
       addToast({ title: "Sucesso", message: "Dados enviados com sucesso" });
     } catch (err) {
+      let msg;
+      if (err.response && err.response.data && err.response.data.err)
+        msg = err.response.data.err;
+      else if (err.response.data) msg = err.response.data;
+      else msg = err.message.err;
+      if (typeof msg === "object") {
+        msg = msg.msg;
+      }
       addToast({
         title: "Erro",
-        message: `Ocorreu um erro ao confirmar ${err.response.data}`,
+        message: `Ocorreu um erro ao confirmar ${msg}`,
       });
     }
-  }, [descValNota, user.idpessoa_fisica, user.idpessoa_juridica, valTotalNota]);
+  }, [
+    addToast,
+    arrayProducts,
+    descValNota,
+    user.idpessoa_fisica,
+    user.idpessoa_juridica,
+    valTotalNota,
+  ]);
 
   return (
     <>

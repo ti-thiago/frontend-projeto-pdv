@@ -17,9 +17,17 @@ const Usuario: React.FC = () => {
       setPessoaFisica(resp.data);
       console.log(resp.data);
     } catch (err) {
+      let msg;
+      if (err.response && err.response.data && err.response.data.err)
+        msg = err.response.data.err;
+      else if (err.response.data) msg = err.response.data;
+      else msg = err.message.err;
+      if (typeof msg === "object") {
+        msg = msg.msg;
+      }
       addToast({
         title: "Erro",
-        message: `${err.response.data}`,
+        message: `${msg}`,
       });
     }
   }
@@ -38,9 +46,17 @@ const Usuario: React.FC = () => {
 
       alert(`${resp.data}`);
     } catch (err) {
+      let msg;
+      if (err.response && err.response.data && err.response.data.err)
+        msg = err.response.data.err;
+      else if (err.response.data) msg = err.response.data;
+      else msg = err.message.err;
+      if (typeof msg === "object") {
+        msg = msg.msg;
+      }
       addToast({
         title: "Erro",
-        message: `Ocorreu um erro ao cadastrar usuário ${err.response.data}`,
+        message: `Ocorreu um erro ao cadastrar usuário ${msg}`,
       });
     }
   }, [idxPessoa, nomeUsuario, pessoaFisica, senhaUsuario]);

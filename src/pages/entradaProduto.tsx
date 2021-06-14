@@ -29,10 +29,10 @@ function handleRenderTable(arrayProds: any) {
             >
               <td>{pdt.idproduto}</td>
               <td>{pdt.desc_produto}</td>
-              <td>{pdt.qtd}</td>
+              <td>{pdt.qtd_entrada}</td>
               <td>{pdt.preco_venda}</td>
-              <td>{pdt.vlDesc}</td>
-              <td>{pdt.vlLiq}</td>
+              <td>{pdt.valor_desconto}</td>
+              <td>{pdt.vl_compra}</td>
             </tr>
           ))}
         </tbody>
@@ -93,9 +93,18 @@ const EntradaProduto: React.FC = () => {
       setPessoaFisicaArray(arrayFilteredPF);
       setPessoaJuridicaArray(arrayFilteredPJ);
     } catch (err) {
+      let msg;
+
+      if (err.response && err.response.data && err.response.data.err)
+        msg = err.response.data.err;
+      else if (err.response.data) msg = err.response.data;
+      else msg = err.message.err;
+      if (typeof msg === "object") {
+        msg = msg.msg;
+      }
       addToast({
         title: "Erro",
-        message: `Ocorreu um erro ao obter os dados ${err.response.data}`,
+        message: `Ocorreu um erro ao obter os dados ${msg}`,
       });
     }
   }
@@ -145,12 +154,12 @@ const EntradaProduto: React.FC = () => {
           <Button
             onClick={async (ev) => {
               if (produtos[idxProduct].desc_produto === "Selecione") return;
-              await handleAddProd();
+              // await handleAddProd();
               let newArray = {
                 ...produtos[idxProduct],
-                vlLiq: vlTotalRef.current.value,
-                vlDesc: descValPdt,
-                qtd: qtd,
+                vl_compra: vlTotalRef.current.value,
+                valor_desconto: descValPdt,
+                qtd_entrada: qtd,
               };
 
               setvalTotalNota(
@@ -213,19 +222,35 @@ const EntradaProduto: React.FC = () => {
       valor_desconto: descValNota,
       valor_liquido: valTotalNota - descValNota,
       nota_fiscal: notaFiscal,
+      itens: arrayProducts,
     };
-    console.log(obj);
 
     try {
       await api.post("/entradaNota", obj);
       addToast({ title: "Sucesso", message: "Dados enviados com sucesso" });
     } catch (err) {
+      let msg;
+      if (err.response && err.response.data && err.response.data.err)
+        msg = err.response.data.err;
+      else if (err.response.data) msg = err.response.data;
+      else msg = err.message.err;
+      if (typeof msg === "object") {
+        msg = msg.msg;
+      }
       addToast({
         title: "Erro",
-        message: `Ocorreu um erro ao enviar os dados ${err.response.data}`,
+        message: `Ocorreu um erro ao enviar os dados ${msg}`,
       });
     }
-  }, [addToast, descValNota, idPessoaFisica, idPessoaJuridica, valTotalNota]);
+  }, [
+    addToast,
+    arrayProducts,
+    descValNota,
+    idPessoaFisica,
+    idPessoaJuridica,
+    notaFiscal,
+    valTotalNota,
+  ]);
 
   const handleAddProd = React.useCallback(async () => {
     try {
@@ -234,19 +259,28 @@ const EntradaProduto: React.FC = () => {
         idproduto: produtos[idxProduct].idproduto,
         qtd_entrada: qtd,
         vl_compra: vlTotalRef.current.value,
+        itens: arrayProducts,
       };
-      const resp = await api.post("/movimentacaoProduto", obj);
+      const resp = await api.post("/entradaNota", obj);
       addToast({
         title: "Sucesso",
         message: `Produto adicionado com sucesso`,
       });
     } catch (err) {
+      let msg;
+      if (err.response && err.response.data && err.response.data.err)
+        msg = err.response.data.err;
+      else if (err.response.data) msg = err.response.data;
+      else msg = err.message.err;
+      if (typeof msg === "object") {
+        msg = msg.msg;
+      }
       addToast({
         title: "Erro",
-        message: `Ocorreu um erro ao adicionar o produto ${err.response.data}`,
+        message: `Ocorreu um erro ao adicionar o produto ${msg}`,
       });
     }
-  }, [addToast, idxProduct, produtos, qtd]);
+  }, [addToast, arrayProducts, idxProduct, produtos, qtd]);
 
   return (
     <>
