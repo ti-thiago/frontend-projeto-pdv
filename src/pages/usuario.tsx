@@ -19,7 +19,7 @@ const Usuario: React.FC = () => {
     } catch (err) {
       addToast({
         title: "Erro",
-        message: `Ocorreu um erro ao obter os dados de Pessoa Fisica ${err.message}`,
+        message: `${err.response.data}`,
       });
     }
   }
@@ -40,7 +40,7 @@ const Usuario: React.FC = () => {
     } catch (err) {
       addToast({
         title: "Erro",
-        message: `Ocorreu um erro ao cadastrar usuário ${err.message}`,
+        message: `Ocorreu um erro ao cadastrar usuário ${err.response.data}`,
       });
     }
   }, [idxPessoa, nomeUsuario, pessoaFisica, senhaUsuario]);
@@ -103,7 +103,7 @@ const Usuario: React.FC = () => {
           <Form.Row>
             <Row className="mt-3">
               <Col xl={3} style={{ marginRight: "10px" }}>
-                <Form.Label>Usuário</Form.Label>
+                <Form.Label>Nome Usuário</Form.Label>
                 <Form.Control
                   onChange={(ev) => setNomeUsuario(ev.target.value)}
                   value={nomeUsuario}

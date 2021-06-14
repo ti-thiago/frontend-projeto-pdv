@@ -50,7 +50,7 @@ const Produtos: React.FC = () => {
       } catch (err) {
         addToast({
           title: "Erro",
-          message: `Ocorreu um erro ao enviar os produtos ${err.message}`,
+          message: `Ocorreu um erro ao enviar os produtos ${err.response.data}`,
         });
       }
     },
@@ -78,7 +78,7 @@ const Produtos: React.FC = () => {
     } catch (err) {
       addToast({
         title: "Erro",
-        message: `Ocorreu um erro ao obter os produtos ${err.message}`,
+        message: `Ocorreu um erro ao obter os produtos ${err.response.data}`,
       });
     }
   }
@@ -94,7 +94,7 @@ const Produtos: React.FC = () => {
     } catch (err) {
       addToast({
         title: "Erro",
-        message: `Ocorreu um erro ao deletar o produto ${err.message}`,
+        message: `Ocorreu um erro ao deletar o produto ${err.response.data}`,
       });
     }
   }

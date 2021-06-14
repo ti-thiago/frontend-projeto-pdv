@@ -26,10 +26,10 @@ const Index: React.FC = () => {
       // localStorage.setItem("@PdvUser", JSON.stringify(result.data));
       // history.push("/pessoa-fisica");
     } catch (err) {
-      console.log(err);
+      console.log(err, err.response.data);
       addToast({
         title: "Erro",
-        message: `Ocorreu um erro ao fazer login ${err.message}`,
+        message: `${err.response.data}`,
       });
     }
   }

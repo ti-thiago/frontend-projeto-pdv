@@ -69,7 +69,7 @@ const PessoaFisica: React.FC = () => {
     } catch (err) {
       addToast({
         title: "Erro",
-        message: `Ocorreu um erro ao obter os dados ${err.message}`,
+        message: `Ocorreu um erro ao obter os dados ${err.response.data}`,
       });
     }
   }
@@ -121,7 +121,7 @@ const PessoaFisica: React.FC = () => {
         setLoading(false);
         addToast({
           title: "Erro",
-          message: `Ocorreu um erro ao atualizar os dados ${err.message}`,
+          message: `Ocorreu um erro ao atualizar os dados ${err.response.data}`,
         });
       }
     },
@@ -156,7 +156,7 @@ const PessoaFisica: React.FC = () => {
       setLoading(false);
       addToast({
         title: "Erro",
-        message: `Ocorreu um erro ao excluir os dados ${err.message}`,
+        message: `Ocorreu um erro ao excluir os dados ${err.response.data}`,
       });
     }
   }

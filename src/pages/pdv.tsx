@@ -84,7 +84,7 @@ const Pdv: React.FC = () => {
     } catch (err) {
       addToast({
         title: "Erro",
-        message: `Ocorreu um erro ao obter os dados ${err.message}`,
+        message: `Ocorreu um erro ao obter os dados ${err.response.data}`,
       });
     }
   }
@@ -217,7 +217,7 @@ const Pdv: React.FC = () => {
     } catch (err) {
       addToast({
         title: "Erro",
-        message: `Ocorreu um erro ao confirmar ${err.message}`,
+        message: `Ocorreu um erro ao confirmar ${err.response.data}`,
       });
     }
   }, [descValNota, user.idpessoa_fisica, user.idpessoa_juridica, valTotalNota]);

@@ -95,7 +95,7 @@ const EntradaProduto: React.FC = () => {
     } catch (err) {
       addToast({
         title: "Erro",
-        message: `Ocorreu um erro ao obter os dados ${err.message}`,
+        message: `Ocorreu um erro ao obter os dados ${err.response.data}`,
       });
     }
   }
@@ -222,7 +222,7 @@ const EntradaProduto: React.FC = () => {
     } catch (err) {
       addToast({
         title: "Erro",
-        message: `Ocorreu um erro ao enviar os dados ${err.message}`,
+        message: `Ocorreu um erro ao enviar os dados ${err.response.data}`,
       });
     }
   }, [addToast, descValNota, idPessoaFisica, idPessoaJuridica, valTotalNota]);
@@ -243,7 +243,7 @@ const EntradaProduto: React.FC = () => {
     } catch (err) {
       addToast({
         title: "Erro",
-        message: `Ocorreu um erro ao adicionar o produto ${err.message}`,
+        message: `Ocorreu um erro ao adicionar o produto ${err.response.data}`,
       });
     }
   }, [addToast, idxProduct, produtos, qtd]);
