@@ -12,13 +12,11 @@ interface IdRoute {
   id: string;
 }
 const PessoaFisica: React.FC = () => {
-  const { params } = useRouteMatch<IdRoute>();
-  const { user, updateUser } = useAuth();
+  const { updateUser } = useAuth();
   const { addToast } = useToast();
   const selectRef = React.useRef<HTMLSelectElement>(null);
   const [idxPessoa, setIdxPessoa] = React.useState<any>();
   const [loading, setLoading] = React.useState(false);
-  const [newPerson, setNewPerson] = React.useState(false);
   const [nome, setNome] = React.useState("");
   const [nrCpf, setNrCpf] = React.useState("");
   const [dtNascimento, setDtNascimento] = React.useState("");
@@ -42,64 +40,69 @@ const PessoaFisica: React.FC = () => {
 
   const [pessoaFisica, setPessoaFisica] = React.useState<any>([]);
 
-  async function getPessoaData(id?: any) {
-    let data = "";
+  const getPessoaData = React.useCallback(
+    async (id?: any) => {
+      let data = "";
 
-    try {
-      if (id) {
-        data = id;
+      try {
+        if (id) {
+          data = id;
 
-        const resp = await api.get(`/pessoaFisica/${data}`);
-        let dt = "";
-        setNome(resp.data.nome);
-        setNrCpf(resp.data.nr_cpf);
-        if (resp.data.dt_nascimento) {
-          dt = resp.data.dt_nascimento;
-          dt = moment(dt, "YYYY-MM-DD").format("DD/MM/YYYY");
+          const resp = await api.get(`/pessoaFisica/${data}`);
+          let dt = "";
+          setNome(resp.data.nome);
+          if (resp.data.dt_nascimento) {
+            dt = resp.data.dt_nascimento;
+            dt = moment(dt, "YYYY-MM-DD").format("DD/MM/YYYY");
+          }
+          setDtNascimento(dt);
+          setSexo(resp.data.sexo);
+          setNrCpf(resp.data.nr_cpf);
+          setEstadoCivil(resp.data.estado_civil);
+          setNrIdentidade(resp.data.nr_identidade);
+          setOrgaoEmissorRg(resp.data.orgao_emissor_rg);
+          setUfOrgaoEmissorRg(resp.data.uf_orgao_emissor_rg);
+          setCep(resp.data.cep);
+          setLogradouro(resp.data.logradouro);
+          setNumero(resp.data.numero);
+          setBairro(resp.data.bairro);
+          setMunicipio(resp.data.municipio);
+          setUf(resp.data.uf);
+          setTelResidencial(resp.data.tel_residencial);
+          setTelCelular(resp.data.tel_celular);
+          setEmail(resp.data.e_mail);
+          setWhatsapp(resp.data.whatsapp);
+        } else {
+          const resp = await api.get(`/pessoaFisica/`);
+          let arrayFiltered = resp.data;
+          arrayFiltered.unshift({ idpessoa_fisica: "", nome: "Selecione" });
+
+          setPessoaFisica(arrayFiltered);
         }
-        setDtNascimento(dt);
-        setNrIdentidade(resp.data.nr_identidade);
-        setOrgaoEmissorRg(resp.data.orgao_emissor_rg);
-        setEstadoCivil(resp.data.estado_civil);
-        setSexo(resp.data.sexo);
-        setCep(resp.data.cep);
-        setLogradouro(resp.data.logradouro);
-        setNumero(resp.data.numero);
-        setBairro(resp.data.bairro);
-        setMunicipio(resp.data.municipio);
-        setUf(resp.data.uf);
-        setTelResidencial(resp.data.tel_residencial);
-        setTelCelular(resp.data.tel_celular);
-        setEmail(resp.data.e_mail);
-        setWhatsapp(resp.data.whatsapp);
-      } else {
-        const resp = await api.get(`/pessoaFisica/`);
-        let arrayFiltered = resp.data;
-        arrayFiltered.unshift({ idpessoa_fisica: "", nome: "Selecione" });
-
-        setPessoaFisica(arrayFiltered);
+      } catch (err) {
+        let msg;
+        if (err.response && err.response.data && err.response.data.err)
+          msg = err.response.data.err;
+        else if (err.response.data) msg = err.response.data;
+        else msg = err.message.err;
+        if (typeof msg === "object") {
+          msg = msg.msg;
+        }
+        addToast({
+          title: "Erro",
+          message: `Ocorreu um erro ao obter os dados ${msg}`,
+        });
       }
-    } catch (err) {
-      let msg;
-      if (err.response && err.response.data && err.response.data.err)
-        msg = err.response.data.err;
-      else if (err.response.data) msg = err.response.data;
-      else msg = err.message.err;
-      if (typeof msg === "object") {
-        msg = msg.msg;
-      }
-      addToast({
-        title: "Erro",
-        message: `Ocorreu um erro ao obter os dados ${msg}`,
-      });
-    }
-  }
+    },
+    [addToast]
+  );
   React.useEffect(() => {
     getPessoaData();
-  }, []);
+  }, [getPessoaData]);
 
   async function handleSubmit(ev: any) {
     ev.preventDefault();
+
     let dtNasc;
     if (dtNascimento)
       dtNasc = moment(dtNascimento, "DD/MM/YYYY").format("YYYY-MM-DD");

@@ -21,16 +21,11 @@ function handleRenderTable(arrayProds: any) {
 
         <tbody>
           {arrayProds.map((pdt: any, idx: number) => (
-            <tr
-              onClick={(ev) => {
-                console.log(ev);
-                arrayProds.splice(idx, 1);
-              }}
-            >
+            <tr>
               <td>{pdt.idproduto}</td>
               <td>{pdt.desc_produto}</td>
               <td>{pdt.qtd_entrada}</td>
-              <td>{pdt.preco_venda}</td>
+              <td>{pdt.vl_unitario}</td>
               <td>{pdt.valor_desconto}</td>
               <td>{pdt.vl_compra}</td>
             </tr>
@@ -44,7 +39,7 @@ function handleRenderTable(arrayProds: any) {
 const EntradaProduto: React.FC = () => {
   const { addToast } = useToast();
   const [arrayProducts, setArrayProducts] = React.useState<any>([]);
-
+  const [valUnit, setValUnit] = React.useState<any>(0);
   const [idxProduct, setIdxProduct] = React.useState<any>(0);
   const [idPessoaFisica, setIdPessoaFisica] = React.useState<any>(0);
   const [idPessoaJuridica, setIdPessoaJuridica] = React.useState<any>(0);
@@ -58,9 +53,8 @@ const EntradaProduto: React.FC = () => {
 
   const [descValNota, setDescValNota] = React.useState<any>(0);
   const [valTotalNota, setvalTotalNota] = React.useState<any>(0);
-  const [valPago, setValPago] = React.useState<any>(0);
-  const [valTroco, setValTroco] = React.useState<any>(0);
 
+  const vlUnitRef = React.useRef<HTMLInputElement>(null);
   const vlTotalRef = React.useRef<any>();
   const vlDescontoRef = React.useRef<any>();
 
@@ -129,9 +123,11 @@ const EntradaProduto: React.FC = () => {
         <Col xl={1} style={{ marginLeft: "10px", marginRight: "10px" }}>
           <Form.Label>Valor unitário</Form.Label>
           <Form.Control
-            onChange={(ev) => {}}
-            value={produtos[idxProduct].preco_venda}
-            disabled
+            ref={vlUnitRef}
+            onChange={(ev) => {
+              setValUnit(ev.target.value);
+            }}
+            value={valUnit}
           />
         </Col>
         <Col xl={1} style={{ marginRight: "10px" }}>
@@ -146,7 +142,7 @@ const EntradaProduto: React.FC = () => {
           <Form.Label>Valor Total</Form.Label>
           <Form.Control
             ref={vlTotalRef}
-            value={qtd * produtos[idxProduct].preco_venda - descValPdt}
+            value={qtd * valUnit - descValPdt}
             disabled
           />
         </Col>
@@ -158,6 +154,7 @@ const EntradaProduto: React.FC = () => {
               let newArray = {
                 ...produtos[idxProduct],
                 vl_compra: vlTotalRef.current.value,
+                vl_unitario: valUnit,
                 valor_desconto: descValPdt,
                 qtd_entrada: qtd,
               };
@@ -176,6 +173,7 @@ const EntradaProduto: React.FC = () => {
 
               setQtd(1);
               setDescValPdt(0);
+              setValUnit(0);
             }}
             variant="success"
           >
@@ -186,18 +184,24 @@ const EntradaProduto: React.FC = () => {
           <Button
             onClick={async (ev) => {
               await setvalTotalNota((prev: any) => {
-                if (arrayProducts.length)
+                if (arrayProducts.length) {
                   return (
                     parseFloat(prev) -
-                    parseFloat(arrayProducts[arrayProducts.length - 1].vlLiq)
+                    parseFloat(
+                      arrayProducts[arrayProducts.length - 1].vl_compra
+                    )
                   );
+                }
                 return parseFloat(prev) - parseFloat(prev);
               });
+
               await setDescValNota((prev: any) => {
                 if (arrayProducts.length) {
                   return (
                     parseFloat(prev) -
-                    parseFloat(arrayProducts[arrayProducts.length - 1].vlDesc)
+                    parseFloat(
+                      arrayProducts[arrayProducts.length - 1].valor_desconto
+                    )
                   );
                 }
                 return parseFloat(prev) - parseFloat(prev);
@@ -215,6 +219,7 @@ const EntradaProduto: React.FC = () => {
   }
 
   const handleSubmit = React.useCallback(async () => {
+    if (!arrayProducts.length) return;
     let obj = {
       idpessoa_fisica: idPessoaFisica !== 0 || null,
       idpessoa_juridica: idPessoaJuridica !== 0 || null,
@@ -294,7 +299,7 @@ const EntradaProduto: React.FC = () => {
           pessoaJuridicaArray.length && (
             <>
               <h3>Entrada Produto</h3>
-              <Form>
+              <Form onSubmit={handleSubmit}>
                 <Form.Row style={{ display: "flex", flexDirection: "row" }}>
                   <Col xl={1} style={{ marginRight: "10px" }}>
                     <Form.Label>Código</Form.Label>
@@ -303,11 +308,11 @@ const EntradaProduto: React.FC = () => {
                   <Col xl={5}>
                     <Form.Label>Nota fiscal</Form.Label>
                     <Form.Control
+                      required
                       onChange={(ev) => {
                         setNotaFiscal(ev.target.value);
                       }}
                       value={notaFiscal}
-                      required
                       maxLength={10}
                     />
                   </Col>
@@ -402,70 +407,50 @@ const EntradaProduto: React.FC = () => {
                       disabled
                     />
                   </Col>
-                  <Col xl={1} style={{ marginRight: "50px" }}>
-                    <Form.Label>Valor Pago</Form.Label>
-                    <Form.Control
-                      onChange={(ev) => {
-                        setValPago(ev.target.value);
-                        setValTroco(
-                          () =>
-                            parseFloat(ev.target.value) -
-                            parseFloat(valTotalNota)
-                        );
-                      }}
-                    />
-                  </Col>
-                  <Col xl={1}>
-                    <Form.Label>Troco</Form.Label>
-                    <Form.Control
-                      onChange={(ev) => {}}
-                      value={valTroco.toFixed(2) || 0}
-                      disabled
-                    />
-                  </Col>
                 </Form.Row>
+                <Container>
+                  <Row>
+                    <Col
+                      xl={1}
+                      style={{
+                        paddingTop: "33px",
+                        marginRight: "10px",
+                        marginBottom: 10,
+                      }}
+                    >
+                      <Button
+                        onClick={(ev) => handleSubmit()}
+                        variant="success"
+                      >
+                        +Confirmar
+                      </Button>
+                    </Col>
+                    <Col
+                      xl={1}
+                      style={{ paddingTop: "33px", marginRight: -25 }}
+                    >
+                      <Button
+                        onClick={(ev) => {
+                          window.location.reload();
+                        }}
+                        variant="primary"
+                      >
+                        Novo
+                      </Button>
+                    </Col>
+                    <Col xl={1} style={{ paddingTop: "33px" }}>
+                      <Button
+                        onClick={(ev) => {
+                          window.location.reload();
+                        }}
+                        variant="danger"
+                      >
+                        Cancelar
+                      </Button>
+                    </Col>
+                  </Row>
+                </Container>
               </Form>
-              <Container>
-                <Row>
-                  <Col
-                    xl={1}
-                    style={{
-                      paddingTop: "33px",
-                      marginRight: "10px",
-                      marginBottom: 10,
-                    }}
-                  >
-                    <Button
-                      onClick={(ev) => {
-                        handleSubmit();
-                      }}
-                      variant="success"
-                    >
-                      +Confirmar
-                    </Button>
-                  </Col>
-                  <Col xl={1} style={{ paddingTop: "33px", marginRight: -25 }}>
-                    <Button
-                      onClick={(ev) => {
-                        window.location.reload();
-                      }}
-                      variant="primary"
-                    >
-                      Novo
-                    </Button>
-                  </Col>
-                  <Col xl={1} style={{ paddingTop: "33px" }}>
-                    <Button
-                      onClick={(ev) => {
-                        window.location.reload();
-                      }}
-                      variant="danger"
-                    >
-                      Cancelar
-                    </Button>
-                  </Col>
-                </Row>
-              </Container>
             </>
           )}
       </Container>

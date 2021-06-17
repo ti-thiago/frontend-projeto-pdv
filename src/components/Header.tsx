@@ -2,7 +2,7 @@ import React from "react";
 import { Nav, Navbar } from "react-bootstrap";
 import { useAuth } from "../hooks/auth";
 const Header: React.FC = () => {
-  const { signOut, user } = useAuth();
+  const { signOut } = useAuth();
   return (
     <Navbar bg="light" expand="lg">
       <Navbar.Brand href="#home">

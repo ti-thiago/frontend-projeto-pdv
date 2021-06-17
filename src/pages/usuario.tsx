@@ -59,7 +59,7 @@ const Usuario: React.FC = () => {
         message: `Ocorreu um erro ao cadastrar usuário ${msg}`,
       });
     }
-  }, [idxPessoa, nomeUsuario, pessoaFisica, senhaUsuario]);
+  }, [addToast, idxPessoa, nomeUsuario, pessoaFisica, senhaUsuario]);
 
   return (
     <>
@@ -128,6 +128,8 @@ const Usuario: React.FC = () => {
               <Col xl={3} style={{ marginRight: "10px" }}>
                 <Form.Label>Senha</Form.Label>
                 <Form.Control
+                  type="password"
+                  required
                   onChange={(ev) => setSenhaUsuario(ev.target.value)}
                   value={senhaUsuario}
                 />

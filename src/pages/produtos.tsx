@@ -105,7 +105,14 @@ const Produtos: React.FC = () => {
       window.location.reload();
     } catch (err) {
       let msg;
-      if (err.response && err.response.data && err.response.data.err)
+      if (
+        err.response &&
+        err.response.data &&
+        err.response.data.err &&
+        err.response.data.err.includes("parent row")
+      )
+        msg = "Produto ja possui movimentação, impossível excluir!";
+      else if (err.response && err.response.data && err.response.data.err)
         msg = err.response.data.err;
       else if (err.response.data) msg = err.response.data;
       else msg = err.message.err;
@@ -114,7 +121,7 @@ const Produtos: React.FC = () => {
       }
       addToast({
         title: "Erro",
-        message: `Ocorreu um erro ao deletar o produto ${msg}`,
+        message: `Ocorreu um erro ao deletar o produto: ${msg}`,
       });
     }
   }
@@ -161,7 +168,15 @@ const Produtos: React.FC = () => {
           <Form.Row style={{ display: "flex", flexDirection: "row" }}>
             <Col xl={2}>
               <Form.Label>Código</Form.Label>
-              <Form.Control disabled />
+              <Form.Control
+                disabled
+                value={
+                  produtos &&
+                  produtos.length &&
+                  idxProduto &&
+                  produtos[idxProduto].idproduto
+                }
+              />
             </Col>
             <Col xl={6} style={{ marginLeft: "10px" }}>
               <Form.Label>Cód. barras</Form.Label>
