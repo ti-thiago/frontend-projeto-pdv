@@ -307,6 +307,8 @@ const EntradaProduto: React.FC = () => {
                         setNotaFiscal(ev.target.value);
                       }}
                       value={notaFiscal}
+                      required
+                      maxLength={10}
                     />
                   </Col>
                 </Form.Row>
@@ -440,6 +442,16 @@ const EntradaProduto: React.FC = () => {
                       variant="success"
                     >
                       +Confirmar
+                    </Button>
+                  </Col>
+                  <Col xl={1} style={{ paddingTop: "33px", marginRight: -25 }}>
+                    <Button
+                      onClick={(ev) => {
+                        window.location.reload();
+                      }}
+                      variant="primary"
+                    >
+                      Novo
                     </Button>
                   </Col>
                   <Col xl={1} style={{ paddingTop: "33px" }}>

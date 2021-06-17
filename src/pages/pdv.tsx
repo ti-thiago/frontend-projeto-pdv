@@ -260,6 +260,7 @@ const Pdv: React.FC = () => {
                         ? ""
                         : `${qtd} X ${produtos[idxProduct].desc_produto}`
                     }
+                    disabled
                   />
                 </Col>
               </Form.Row>
@@ -337,6 +338,16 @@ const Pdv: React.FC = () => {
                     variant="success"
                   >
                     +Confirmar
+                  </Button>
+                </Col>
+                <Col xl={1} style={{ paddingTop: "33px", marginRight: -25 }}>
+                  <Button
+                    onClick={(ev) => {
+                      window.location.reload();
+                    }}
+                    variant="primary"
+                  >
+                    Novo
                   </Button>
                 </Col>
                 <Col xl={1} style={{ paddingTop: "33px" }}>

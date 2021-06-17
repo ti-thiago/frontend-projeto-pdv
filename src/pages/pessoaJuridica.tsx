@@ -28,7 +28,7 @@ const PessoaFisica: React.FC = () => {
   const [numero, setNumero] = React.useState("");
   const [bairro, setBairro] = React.useState("");
   const [municipio, setMunicipio] = React.useState("");
-  const [uf, setUf] = React.useState(user.uf);
+  const [uf, setUf] = React.useState("");
   const [telefone, setTelefone] = React.useState("");
   const [eMail, setEmail] = React.useState("");
   const [pessoaContato, setPessoaContato] = React.useState("");
@@ -233,6 +233,7 @@ const PessoaFisica: React.FC = () => {
               <Form.Control
                 required
                 placeholder="00000000000000"
+                maxLength={14}
                 onChange={(ev) => setCnpj(ev.target.value)}
                 value={cnpj}
               />
@@ -241,6 +242,7 @@ const PessoaFisica: React.FC = () => {
               <Form.Label>Inscrição Estadual</Form.Label>
               <Form.Control
                 required
+                maxLength={14}
                 value={inscEstadual}
                 onChange={(ev) => setInscEstadual(ev.target.value)}
               />
@@ -261,6 +263,7 @@ const PessoaFisica: React.FC = () => {
             <Col xl={8}>
               <Form.Label>Nome Fantasia</Form.Label>
               <Form.Control
+                required
                 value={nomeFantasia}
                 onChange={(ev) => setNomeFantasia(ev.target.value)}
               />
@@ -317,12 +320,13 @@ const PessoaFisica: React.FC = () => {
                 as="select"
                 defaultValue={uf || "GO"}
                 onChange={(ev) => setUf(ev.target.value)}
+                value={uf}
               >
-                <option>GO</option>
-                <option>MT</option>
-                <option>SP</option>
-                <option>PR</option>
-                <option>RJ</option>
+                <option value="GO">GO</option>
+                <option value="MT">MT</option>
+                <option value="SP">SP</option>
+                <option value="PR">PR</option>
+                <option value="RJ">RJ</option>
               </Form.Control>
             </Form.Group>
           </Form.Row>

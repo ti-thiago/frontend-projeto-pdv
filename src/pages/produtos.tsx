@@ -42,11 +42,7 @@ const Produtos: React.FC = () => {
           title: "Sucesso",
           message: `${msg}`,
         });
-        setDesc("");
-        setPrice("");
-        setUnMed("");
-        setEstoque("");
-        setCodBarras("");
+        window.location.reload();
       } catch (err) {
         let msg;
         if (err.response && err.response.data && err.response.data.err)
@@ -170,6 +166,7 @@ const Produtos: React.FC = () => {
             <Col xl={6} style={{ marginLeft: "10px" }}>
               <Form.Label>Cód. barras</Form.Label>
               <Form.Control
+                maxLength={10}
                 value={codBarras}
                 onChange={(ev) => setCodBarras(ev.target.value)}
               />
@@ -180,6 +177,7 @@ const Produtos: React.FC = () => {
               <Form.Label>Descrição</Form.Label>
               <Form.Control
                 value={desc}
+                required
                 onChange={(ev) => setDesc(ev.target.value)}
               />
             </Col>
@@ -190,6 +188,7 @@ const Produtos: React.FC = () => {
               <Form.Label>Preço de venda</Form.Label>
               <Form.Control
                 value={price}
+                required
                 onChange={(ev) => setPrice(ev.target.value)}
               />
             </Col>
@@ -197,6 +196,8 @@ const Produtos: React.FC = () => {
               <Form.Label>Unidade de medida</Form.Label>
               <Form.Control
                 value={unMed}
+                required
+                maxLength={3}
                 onChange={(ev) => setUnMed(ev.target.value)}
               />
             </Col>

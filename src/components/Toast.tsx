@@ -28,7 +28,7 @@ const ShowToast: React.FC<ToastProps> = ({ messages }) => {
       {messages.map((msg: any, idx: number) => (
         <Col xs={6} key={msg.id}>
           <Toast
-            style={{ position: "absolute", top: 30, right: 5 }}
+            style={{ position: "absolute", top: 130, right: 5 }}
             onClose={() => setShow((prev) => !prev)}
             show={show}
             delay={3000}

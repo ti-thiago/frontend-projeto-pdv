@@ -33,7 +33,7 @@ const PessoaFisica: React.FC = () => {
   const [numero, setNumero] = React.useState("");
   const [bairro, setBairro] = React.useState("");
   const [municipio, setMunicipio] = React.useState("");
-  const [uf, setUf] = React.useState(user.uf);
+  const [uf, setUf] = React.useState("");
   const [telResidencial, setTelResidencial] = React.useState("");
   const [telCelular, setTelCelular] = React.useState("");
 
@@ -257,6 +257,7 @@ const PessoaFisica: React.FC = () => {
               <Form.Label>CPF</Form.Label>
               <Form.Control
                 value={nrCpf}
+                required
                 placeholder="0000000000"
                 maxLength={11}
                 onChange={(ev) => setNrCpf(ev.target.value)}
@@ -346,12 +347,13 @@ const PessoaFisica: React.FC = () => {
                 as="select"
                 defaultValue={uf || "GO"}
                 onChange={(ev) => setUf(ev.target.value)}
+                value={uf}
               >
-                <option>GO</option>
-                <option>MT</option>
-                <option>SP</option>
-                <option>PR</option>
-                <option>RJ</option>
+                <option value={"GO"}>GO</option>
+                <option value="MT">MT</option>
+                <option value="SP">SP</option>
+                <option value="PR">PR</option>
+                <option value="RJ">RJ</option>
               </Form.Control>
             </Form.Group>
           </Form.Row>
@@ -388,6 +390,8 @@ const PessoaFisica: React.FC = () => {
                 onChange={(ev) => {
                   if (ev.target.checked) {
                     setWhatsapp("S");
+                  } else {
+                    setWhatsapp("N");
                   }
                 }}
                 checked={whatsapp === "S"}
